@@ -18,14 +18,18 @@ class UnitController extends Controller
     public function store(Request $request, Property $property)
     {
         $request->validate([
-            'unit_number' => 'required|string|max:255', 
+            'unit_number' => 'required|string|max:255',
+            'unit_type' => 'required|string|max:255',
             'rent_amount' => 'required|numeric|min:0',
+            'fixed_deposit' => 'required|numeric|min:0', // Validating the deposit
         ]);
 
         Unit::create([
             'property_id' => $property->id,
             'unit_number' => $request->unit_number,
+            'unit_type' => $request->unit_type,
             'rent_amount' => $request->rent_amount,
+            'fixed_deposit' => $request->fixed_deposit, // Saving to the database
             'status' => 'vacant', 
         ]);
 

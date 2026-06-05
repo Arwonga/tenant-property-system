@@ -34,24 +34,24 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Number/Name</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Number</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monthly Rent</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deposit</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Tenant</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
                                     @foreach($units as $unit)
                                         <tr class="hover:bg-gray-50 transition">
                                             <td class="px-6 py-4 whitespace-nowrap font-bold text-gray-900">{{ $unit->unit_number }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{ $unit->unit_type }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap font-bold text-green-600">KES {{ number_format($unit->rent_amount, 2) }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-gray-500">KES {{ number_format($unit->fixed_deposit, 2) }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                                     {{ ucfirst($unit->status) }}
                                                 </span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <span class="text-gray-400">Unassigned</span>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -76,11 +76,29 @@
                         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700">Unit Name / Number</label>
-                                <input type="text" name="unit_number" class="mt-1 w-full rounded border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200" placeholder="e.g. Room 101" required>
+                                <input type="text" name="unit_number" class="mt-1 w-full rounded border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200" placeholder="e.g. QW12" required>
                             </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700">Unit Type</label>
+                                <select name="unit_type" class="mt-1 w-full rounded border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200" required>
+                                    <option value="Bedsitter">Bedsitter</option>
+                                    <option value="1 Bedroom">1 Bedroom</option>
+                                    <option value="2 Bedroom">2 Bedroom</option>
+                                    <option value="3 Bedroom">3 Bedroom</option>
+                                    <option value="Studio">Studio</option>
+                                    <option value="Commercial Shop">Commercial Shop</option>
+                                </select>
+                            </div>
+
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700">Monthly Rent (KES)</label>
-                                <input type="number" name="rent_amount" class="mt-1 w-full rounded border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200" placeholder="e.g. 15000" required>
+                                <input type="number" name="rent_amount" class="mt-1 w-full rounded border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200" placeholder="e.g. 12000" required>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700">Security Deposit (KES)</label>
+                                <input type="number" name="fixed_deposit" class="mt-1 w-full rounded border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200" placeholder="e.g. 12000" required>
                             </div>
                         </div>
                         <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-200">
