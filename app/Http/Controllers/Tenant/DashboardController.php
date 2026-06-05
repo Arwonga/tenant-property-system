@@ -9,6 +9,7 @@ use App\Models\MaintenanceTicket;
 use App\Models\Unit; // Crucial import for checking rooms
 use Illuminate\Support\Facades\Auth; // Crucial import for user sessions
 
+
 class DashboardController extends Controller
 {
     public function index()
@@ -34,7 +35,9 @@ class DashboardController extends Controller
             ->with('media') 
             ->get();
 
-        return view('tenant.dashboard', compact('outstandingBalance', 'recentInvoices', 'activeTickets'));
+        $unit = Unit::with('property')->where('tenant_id', Auth::id())->first();
+
+        return view('tenant.dashboard', compact('outstandingBalance', 'recentInvoices', 'activeTickets', 'unit'));
     }
 
     public function storeTicket(Request $request)

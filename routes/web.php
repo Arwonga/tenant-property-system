@@ -34,6 +34,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Property Management Routes
     Route::get('/properties', [\App\Http\Controllers\Admin\PropertyController::class, 'index'])->name('properties.index');
     Route::post('/properties', [\App\Http\Controllers\Admin\PropertyController::class, 'store'])->name('properties.store');
+
+    // NEW: Tenant Assignment Route
+    Route::post('/properties/{property}/units/{unit}/assign', [\App\Http\Controllers\Admin\UnitController::class, 'assignTenant'])->name('units.assign');
     
 });
 // The crucial line that loads /login and /register!

@@ -7,6 +7,57 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            @if($unit)
+                <!-- Active Lease Information -->
+                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg border-l-8 border-blue-800 mb-8">
+                    <div class="p-6 sm:p-10 bg-white">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-2xl font-black text-gray-900 tracking-tight">My Active Lease</h3>
+                            <span class="px-3 py-1 bg-green-100 text-green-800 font-bold rounded-full text-sm">Active</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <!-- Property Info -->
+                            <div class="bg-gray-50 p-6 rounded-lg border border-gray-100">
+                                <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Property</p>
+                                <p class="font-black text-xl text-blue-900">{{ $unit->property->name }}</p>
+                                <p class="text-gray-600 mt-1">{{ $unit->property->location }}</p>
+                            </div>
+                            
+                            <!-- Unit Info -->
+                            <div class="bg-gray-50 p-6 rounded-lg border border-gray-100">
+                                <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Unit Details</p>
+                                <p class="font-black text-xl text-gray-900">{{ $unit->unit_number }}</p>
+                                <p class="text-gray-600 mt-1">{{ $unit->unit_type }}</p>
+                            </div>
+                            
+                            <!-- Rent -->
+                            <div class="bg-gray-50 p-6 rounded-lg border border-gray-100">
+                                <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Monthly Rent</p>
+                                <p class="font-black text-3xl text-green-600">KES {{ number_format($unit->rent_amount, 2) }}</p>
+                            </div>
+                            
+                            <!-- Deposit -->
+                            <div class="bg-gray-50 p-6 rounded-lg border border-gray-100">
+                                <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Security Deposit</p>
+                                <p class="font-black text-2xl text-gray-700">KES {{ number_format($unit->fixed_deposit, 2) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <!-- No Unit Assigned Yet -->
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border-l-4 border-yellow-400 mb-8">
+                    <div class="p-6 bg-white text-center py-12">
+                        <svg class="mx-auto h-16 w-16 text-yellow-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <h3 class="text-xl font-black text-gray-900 tracking-tight">Account Under Review</h3>
+                        <p class="text-gray-500 mt-2 max-w-md mx-auto">You have successfully registered, but property management has not assigned your account to a specific unit yet.</p>
+                    </div>
+                </div>
+            @endif
             
             @if(session('success'))
                 <div class="mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 font-medium rounded shadow-sm">
