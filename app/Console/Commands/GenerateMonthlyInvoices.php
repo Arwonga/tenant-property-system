@@ -29,8 +29,8 @@ class GenerateMonthlyInvoices extends Command
                 'user_id' => $unit->tenant_id,
                 'invoice_month' => $currentMonth,
             ], [
-                'rent_amount' => $unit->monthly_rent,
-                'total_due' => $unit->monthly_rent, // Utilities added later
+                'rent_amount' => $unit->rent_amount,
+                'total_due' => $unit->rent_amount, // Utilities added later
                 'due_date' => Carbon::now()->startOfMonth()->addDays(4), // Rent is due by the 5th
                 'status' => 'unpaid'
             ]);

@@ -38,6 +38,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // NEW: Tenant Assignment Route
     Route::post('/properties/{property}/units/{unit}/assign', [\App\Http\Controllers\Admin\UnitController::class, 'assignTenant'])->name('units.assign');
     
+
+
 });
 // The crucial line that loads /login and /register!
 require __DIR__.'/auth.php';

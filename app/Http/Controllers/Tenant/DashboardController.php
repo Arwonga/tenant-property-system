@@ -10,6 +10,7 @@ use App\Models\Unit; // Crucial import for checking rooms
 use Illuminate\Support\Facades\Auth; // Crucial import for user sessions
 
 
+
 class DashboardController extends Controller
 {
     public function index()
@@ -37,36 +38,33 @@ class DashboardController extends Controller
 
         $unit = Unit::with('property')->where('tenant_id', Auth::id())->first();
 
-        return view('tenant.dashboard', compact('outstandingBalance', 'recentInvoices', 'activeTickets', 'unit'));
+        // Fetch the tenant's maintenance tickets
+        $tickets = MaintenanceTicket::where('user_id', Auth::id())->latest()->get(); 
+
+        return view('tenant.dashboard', compact('outstandingBalance', 'recentInvoices', 'activeTickets', 'unit', 'tickets'));
     }
 
     public function storeTicket(Request $request)
     {
         $request->validate([
-            'category' => 'required|string',
-            'priority' => 'required|string',
-            'description' => 'required|string|max:1000',
+            'subject' => 'required|string|max:255',
+            'description' => 'required|string',
         ]);
 
-        // Check if tenant has a room assigned
         $unit = Unit::where('tenant_id', Auth::id())->first();
 
-        if (!$unit) {
-            return back()->with('error', 'System Error: You must be assigned to a unit before submitting a ticket.');
-        }
-
-        // Create the ticket
         MaintenanceTicket::create([
-            'user_id' => Auth::id(),
+            'user_id' => Auth::id(), 
             'unit_id' => $unit->id,
-            'category' => $request->category,
-            'priority' => $request->priority,
+            'subject' => $request->subject,
             'description' => $request->description,
-            'status' => 'Pending',
+            'status' => 'pending',
         ]);
 
-        return back()->with('success', 'Maintenance request submitted successfully!');
+        return back()->with('success', 'Maintenance ticket submitted successfully. Management has been notified!');
     }
+
+    
     public function processPayment(Request $request)
     {
         $request->validate([

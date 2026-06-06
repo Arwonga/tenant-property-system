@@ -12,13 +12,21 @@ class Invoice extends Model
         'status', 'invoice_month'
     ];
 
+    // This builds the relationship to fetch the Tenant's details
+    public function tenant()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    // (If you don't already have the unit relationship, add this one too!)
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class, 'unit_id');
+    }
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function unit()
-    {
-        return $this->belongsTo(Unit::class);
-    }
+    
 }

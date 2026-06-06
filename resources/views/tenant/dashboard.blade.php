@@ -70,24 +70,41 @@
                 </div>
             @endif
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-                <div class="p-6 text-gray-900 flex justify-between items-center border-l-4 {{ $outstandingBalance > 0 ? 'border-red-500' : 'border-green-500' }}">
-                    <div>
-                        <h3 class="text-lg font-bold text-gray-700 uppercase tracking-wider">Current Balance</h3>
-                        <p class="text-sm text-gray-500">Total outstanding arrears and unbilled utilities.</p>
-                    </div>
-                    <div class="text-right flex items-center gap-4">
-                        <span class="text-4xl font-black {{ $outstandingBalance > 0 ? 'text-red-600' : 'text-green-600' }}">
-                            KES {{ number_format($outstandingBalance, 2) }}
-                        </span>
-                        @if($outstandingBalance > 0)
-                            <button type="button" onclick="document.getElementById('paymentModal').classList.remove('hidden')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded shadow-lg transition transform hover:scale-105">
-                                Pay Now
-                            </button>
-                        @endif
-                    </div>
-                </div>
-            </div>
+            @php
+    $currentBalance = 0;
+    if(isset($invoices)) {
+        // This hunts down all unpaid or partially paid invoices and subtracts what they already paid
+        $currentBalance = $invoices->whereIn('status', ['unpaid', 'partial'])->sum(function($invoice) {
+            return $invoice->total_due - $invoice->amount_paid;
+        });
+    }
+@endphp
+
+@if($currentBalance > 0)
+    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border-l-8 border-red-600 mb-8 flex justify-between items-center p-6 sm:p-8">
+        <div>
+            <h3 class="text-xl font-black text-gray-900 tracking-widest uppercase">Current Balance</h3>
+            <p class="text-sm text-gray-500 mt-1">Total outstanding arrears and unbilled utilities.</p>
+        </div>
+        <div class="flex items-center space-x-6">
+            <span class="font-black text-4xl text-red-600">KES {{ number_format($currentBalance, 2) }}</span>
+            
+            <button type="button" onclick="document.getElementById('mpesaModal').classList.remove('hidden')" class="bg-green-600 text-white px-8 py-3 rounded-md font-black shadow-lg hover:bg-green-500 transition transform hover:scale-105">
+                Pay Now
+            </button>
+        </div>
+    </div>
+@else
+    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border-l-8 border-green-500 mb-8 flex justify-between items-center p-6 sm:p-8">
+        <div>
+            <h3 class="text-xl font-black text-gray-900 tracking-widest uppercase">Account Cleared</h3>
+            <p class="text-sm text-gray-500 mt-1">You have no outstanding arrears. Thank you for paying on time!</p>
+        </div>
+        <div class="flex items-center space-x-6">
+            <span class="font-black text-4xl text-green-600">KES 0.00</span>
+        </div>
+    </div>
+@endif
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -116,34 +133,37 @@
                     </div>
                 </div>
 
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 border-b border-gray-200">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold text-gray-800">Active Maintenance</h3>
-                            <button type="button" onclick="document.getElementById('ticketModal').classList.remove('hidden')" class="text-sm bg-blue-600 text-white px-3 py-1 rounded shadow hover:bg-blue-700 transition">
-                                + New Ticket
-                            </button>
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-100">
+    <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+        <h3 class="text-lg font-black text-gray-900 tracking-widest uppercase">Active Maintenance</h3>
+        <button type="button" onclick="document.getElementById('ticketModal').classList.remove('hidden')" class="bg-blue-600 text-white px-4 py-2 rounded-md font-bold shadow hover:bg-blue-500 transition text-sm">
+            + New Ticket
+        </button>
+    </div>
+    <div class="p-0">
+        @if(isset($tickets) && $tickets->count() > 0)
+            <ul class="divide-y divide-gray-100">
+                @foreach($tickets as $ticket)
+                    <li class="p-6 hover:bg-gray-50 transition">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-gray-900">{{ $ticket->subject }}</h4>
+                                <p class="text-sm text-gray-500 mt-1">{{ $ticket->description }}</p>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-xs font-bold {{ $ticket->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' }}">
+                                {{ strtoupper($ticket->status) }}
+                            </span>
                         </div>
-                        
-                        @if($activeTickets->isEmpty())
-                            <p class="text-gray-500 text-sm">No active maintenance requests.</p>
-                        @else
-                            <ul class="divide-y divide-gray-200">
-                                @foreach($activeTickets as $ticket)
-                                    <li class="py-3">
-                                        <div class="flex justify-between">
-                                            <p class="font-semibold text-gray-700">{{ $ticket->category }} Issue</p>
-                                            <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
-                                                {{ $ticket->status }}
-                                            </span>
-                                        </div>
-                                        <p class="text-sm text-gray-500 mt-1 truncate">{{ $ticket->description }}</p>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @endif
-                    </div>
-                </div>
+                    </li>
+                @endforeach
+            </ul>
+        @else
+            <div class="p-6 text-center text-gray-500 text-sm">
+                No active maintenance requests.
+            </div>
+        @endif
+    </div>
+</div>
             </div>
         </div>
 
@@ -219,4 +239,86 @@
         </div>
 
     </div>
+    <div id="mpesaModal" class="hidden fixed inset-0 z-[100] overflow-y-auto">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        
+        <div class="fixed inset-0 bg-gray-900 bg-opacity-80 transition-opacity" onclick="document.getElementById('mpesaModal').classList.add('hidden')"></div>
+        
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+        
+        <div class="relative z-[110] inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border-t-8 border-green-500">
+            <form method="POST" action="{{ route('tenant.payment.process') }}">
+                @csrf
+                
+                @if(isset($invoices) && $invoices->where('status', 'unpaid')->first())
+                    <input type="hidden" name="invoice_id" value="{{ $invoices->where('status', 'unpaid')->first()->id }}">
+                @endif
+
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 text-center">
+                    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                        <svg class="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-black text-gray-900">Lipa na M-Pesa</h3>
+                    <p class="text-sm text-gray-500 mt-2">Enter your phone number to receive the STK push prompt.</p>
+                    
+                    <div class="mt-6 text-left">
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold text-gray-700 mb-1">M-Pesa Phone Number</label>
+                            <input type="text" name="phone_number" class="w-full rounded border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 font-bold" placeholder="07XX XXX XXX" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Amount to Pay (KES)</label>
+                            <input type="number" name="amount" value="{{ isset($currentBalance) ? $currentBalance : 0 }}" class="w-full rounded border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 font-bold text-green-600" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 px-4 py-4 sm:px-6 flex justify-between space-x-3 border-t border-gray-200">
+                    <button type="button" onclick="document.getElementById('mpesaModal').classList.add('hidden')" class="w-1/2 rounded-md border border-gray-300 shadow-sm px-4 py-3 bg-white text-gray-700 font-bold hover:bg-gray-50 transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="w-1/2 rounded-md shadow-sm px-4 py-3 bg-green-600 text-white font-bold hover:bg-green-700 transition">
+                        Send STK Push
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div id="ticketModal" class="hidden fixed inset-0 z-[100] overflow-y-auto">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-900 bg-opacity-80 transition-opacity" onclick="document.getElementById('ticketModal').classList.add('hidden')"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+        
+        <div class="relative z-[110] inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border-t-8 border-blue-600">
+            <form method="POST" action="{{ route('tenant.maintenance.store') }}">
+                @csrf
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <h3 class="text-2xl font-black text-gray-900 mb-4">Report an Issue</h3>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Issue Subject</label>
+                        <input type="text" name="subject" class="w-full rounded border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200" placeholder="e.g., Leaking kitchen pipe" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Detailed Description</label>
+                        <textarea name="description" rows="4" class="w-full rounded border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200" placeholder="Please describe the issue in detail so maintenance can bring the right tools..." required></textarea>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 px-4 py-4 sm:px-6 flex justify-between space-x-3 border-t border-gray-200">
+                    <button type="button" onclick="document.getElementById('ticketModal').classList.add('hidden')" class="w-1/2 rounded-md border border-gray-300 shadow-sm px-4 py-3 bg-white text-gray-700 font-bold hover:bg-gray-50 transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="w-1/2 rounded-md shadow-sm px-4 py-3 bg-blue-600 text-white font-bold hover:bg-blue-700 transition">
+                        Submit Ticket
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 </x-app-layout>
