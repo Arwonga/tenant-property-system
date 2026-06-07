@@ -2,10 +2,11 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\PaymentWebhookController;
+use App\Http\Controllers\Api\AuthController;
+
+// The Mobile Login Bridge
+Route::post('/login', [AuthController::class, 'login']);
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
-
-Route::post('/webhooks/payment', [PaymentWebhookController::class, 'handle']);
