@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Unit;
 use App\Models\Invoice;
+use App\Models\MaintenanceTicket;
 
 class TenantController extends Controller
 {
@@ -49,6 +50,54 @@ class TenantController extends Controller
                     ];
                 })
             ]
+        ], 200);
+    }
+
+    // Catch Maintenance Tickets from the Mobile App
+    public function storeTicket(Request $request)
+    {
+        $request->validate([
+            'subject' => 'required|string|max:255',
+            'description' => 'required|string',
+        ]);
+
+        $user = $request->user();
+        $unit = Unit::where('tenant_id', $user->id)->first();
+
+        if (!$unit) {
+            return response()->json(['status' => 'error', 'message' => 'No assigned unit found.'], 404);
+        }
+
+        $ticket = MaintenanceTicket::create([
+            'user_id' => $user->id,
+            'unit_id' => $unit->id,
+            'subject' => $request->subject,
+            'description' => $request->description,
+            'status' => 'pending',
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Maintenance ticket submitted successfully.',
+            'ticket' => $ticket
+        ], 201);
+    }
+
+    // Trigger M-Pesa STK Push from the Mobile App
+    public function initiatePayment(Request $request)
+    {
+        $request->validate([
+            'phone_number' => 'required|string',
+            'amount' => 'required|numeric|min:1',
+            'invoice_id' => 'nullable|exists:invoices,id' // Optional: link to a specific invoice
+        ]);
+
+        // Note: Your actual Daraja API STK Push logic will go here to trigger the prompt on the tenant's phone.
+        // For the mobile app's UI, we immediately return a success message so it can show a loading/success screen.
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'M-Pesa STK Push initiated. Please check your phone to enter your PIN.',
         ], 200);
     }
 }

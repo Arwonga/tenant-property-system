@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+      x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' || (!('darkMode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) }"
+      @toggle-dark.window="darkMode = !darkMode"
+      x-init="$watch('darkMode', val => localStorage.setItem('darkMode', val))"
+      x-bind:class="{ 'dark': darkMode }">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,8 +18,8 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+    <body class="font-sans antialiased bg-gray-100 dark:bg-gray-900 dark:text-white transition-colors duration-300">
+        <div class="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
             @include('layouts.navigation')
 
             <!-- Page Heading -->

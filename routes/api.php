@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\TenantController; // Don't forget to import the new controller!
+use App\Http\Controllers\Api\TenantController; 
 
 // The Public Mobile Login Bridge
 Route::post('/login', [AuthController::class, 'login']);
@@ -18,5 +18,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Get the Tenant Dashboard Data
     Route::get('/tenant/dashboard', [TenantController::class, 'getDashboardData']);
+
+    // Submit a Maintenance Ticket
+    Route::post('/tenant/maintenance', [TenantController::class, 'storeTicket']);
+
+    //  Initiate M-Pesa Payment
+    Route::post('/tenant/pay', [TenantController::class, 'initiatePayment']);
     
 });
